@@ -1,5 +1,12 @@
-INSTALL.txt
-LICENSE.txt
-README.txt
-demos/
-extras/documentation
+.idea/
+.vagrant/
+vendor/
+build/
+artifacts/
+
+phpunit.xml
+composer.lock
+composer-test.lock
+
+.DS_STORE
+.coveralls.yml
