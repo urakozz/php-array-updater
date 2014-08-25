@@ -29,11 +29,13 @@ class ArrayUpdater
   public function node($name)
   {
     $this->path[] = $name;
+    return $this;
   }
 
   public function all()
   {
     $this->path[] = None::create();
+    return $this;
   }
 
   public function replace($search, $replace)
@@ -64,6 +66,22 @@ class ArrayUpdater
 
     iterator_to_array($it);
     $this->data = $data;
+  }
+
+  public function arraySet(&$arr, array $path, $value)
+  {
+    $cur =& $arr;
+    foreach ($path as $segment)
+    {
+      if (!isset($cur[$segment]))
+      {
+        $cur[$segment] = [];
+      }
+
+      $cur =& $cur[$segment];
+    }
+    $cur = $value;
+    unset($cur);
   }
 
 }
