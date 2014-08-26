@@ -1,4 +1,4 @@
-php-array-updater
+PHP Array Updater
 =================
 
 Recursive Array Updater
