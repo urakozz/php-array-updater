@@ -108,5 +108,20 @@ class ArrayUpdaterTest extends \PHPUnit_Framework_TestCase
     );
     $this->assertSame($expected, $array);
 
+    $array = [];
+    ArrayPathHelper::pathSet($array, ['this', 'is', 'the', 'path', 0], 100);
+    $expected = array(
+      'this' => array(
+        'is' => array(
+          'the' => array(
+            'path' => [
+              100
+            ]
+          )
+        )
+      )
+    );
+    $this->assertSame($expected, $array);
+
   }
 } 
