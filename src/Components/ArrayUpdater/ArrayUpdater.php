@@ -5,6 +5,7 @@
 
 namespace Kozz\Components\ArrayUpdater;
 
+use CallbackFilterIterator;
 use Kozz\Helper\ArrayHelper\ArrayPathHelper;
 use PhpOption\None;
 use RecursiveArrayIterator;
@@ -27,6 +28,11 @@ class ArrayUpdater
    * @var array
    */
   protected $path = [];
+
+  /**
+   * @var array
+   */
+  protected $pathFiltered = [];
 
   /**
    * @var
@@ -59,7 +65,7 @@ class ArrayUpdater
   public function node($name)
   {
     $this->path[] = $name;
-    $this->count = null;
+    $this->clearTmpVars();
     return $this;
   }
 
@@ -90,27 +96,7 @@ class ArrayUpdater
   public function replaceAssoc(array $association)
   {
     $iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($this->data));
-    $it       =
-      new \CallbackFilterIterator($iterator, function (
-        $current,
-        $key,
-        RecursiveIteratorIterator $iterator
-      ) use ($association) {
-        if ($iterator->getDepth() + 1 === $this->countNodes() && isset($association[$current]))
-        {
-          $currentPath = ArrayPathHelper::getPath($iterator);
-          $filter      = array_filter($this->path, function($value){
-              return !$value instanceof None;
-            });
-          $diff        = array_diff_assoc($currentPath, $filter);
-          $keys        = array_intersect_key($filter, $diff);
-
-          if(!$keys)
-          {
-            ArrayPathHelper::pathSet($this->data, $currentPath, $association[$current]);
-          }
-        }
-      });
+    $it       = new CallbackFilterIterator($iterator, $this->getClosure($association));
 
     iterator_to_array($it);
     return $this->data;
@@ -122,10 +108,79 @@ class ArrayUpdater
    */
   protected function countNodes()
   {
-    if(null === $this->count)
+    if(!$this->count)
     {
       $this->count = count($this->path);
     }
     return $this->count;
+  }
+
+  /**
+   * @return array
+   */
+  protected function getFilteredPath()
+  {
+    if(!$this->pathFiltered)
+    {
+      $this->pathFiltered = array_filter($this->path, function($value){
+        return !$value instanceof None;
+      });
+    }
+    return $this->pathFiltered;
+  }
+
+  /**
+   * @param array $association
+   *
+   * @return callable
+   */
+  protected function getClosure(array $association)
+  {
+    return function ($current, $key, RecursiveIteratorIterator $iterator) use ($association)
+    {
+      if ($this->isLooksCorrect($iterator, $association, $current))
+      {
+        $currentPath = ArrayPathHelper::getPath($iterator);
+
+        if($this->isPathMatch($currentPath))
+        {
+          ArrayPathHelper::pathSet($this->data, $currentPath, $association[$current]);
+        }
+      }
+    };
+  }
+
+  /**
+   * @param RecursiveIteratorIterator $iterator
+   * @param array                     $association
+   * @param                           $current
+   *
+   * @return bool
+   */
+  protected function isLooksCorrect(RecursiveIteratorIterator $iterator, array $association, $current)
+  {
+    return $iterator->getDepth() + 1 === $this->countNodes() && isset($association[$current]);
+  }
+
+  /**
+   * @param array $currentPath
+   *
+   * @return bool
+   */
+  protected function isPathMatch(array $currentPath)
+  {
+    $filter = $this->getFilteredPath();
+    $diff   = array_diff_assoc($currentPath, $filter);
+    $keys   = array_intersect_key($filter, $diff);
+    return empty($keys);
+  }
+
+  /**
+   * @return void
+   */
+  protected function clearTmpVars()
+  {
+    $this->count = null;
+    $this->pathFiltered = null;
   }
 }
