@@ -1,7 +1,7 @@
 {
   "name": "kozz/array-updater",
   "type": "library",
-  "description": "Array=updater library",
+  "description": "Library allows easily update multidimensional arrays",
   "keywords": ["data", "merge"],
   "homepage": "http://github.com/urakozz/php-array-updater",
   "license": "MIT",
@@ -20,7 +20,7 @@
   },
 
   "suggest": {
-    "php": ">=5.5.15"
+    "php": ">=5.5.16"
   },
 
   "autoload": {

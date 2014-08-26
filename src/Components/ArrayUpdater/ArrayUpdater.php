@@ -5,83 +5,127 @@
 
 namespace Kozz\Components\ArrayUpdater;
 
+use Kozz\Helper\ArrayHelper\ArrayPathHelper;
 use PhpOption\None;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 
+/**
+ * Class ArrayUpdater
+ *
+ * @package Kozz\Components\ArrayUpdater
+ */
 class ArrayUpdater
 {
 
+  /**
+   * @var array
+   */
   protected $data = [];
 
+  /**
+   * @var array
+   */
   protected $path = [];
 
-  public function __construct(array &$data)
+  /**
+   * @var
+   */
+  protected $count;
+
+  /**
+   * @param array $data
+   */
+  public function __construct(array $data)
   {
     $this->data = $data;
   }
 
-  public static function from(array &$data)
+  /**
+   * @param array $data
+   *
+   * @return ArrayUpdater
+   */
+  public static function from(array $data)
   {
     return new self($data);
   }
 
+  /**
+   * @param $name
+   *
+   * @return $this
+   */
   public function node($name)
   {
     $this->path[] = $name;
+    $this->count = null;
     return $this;
   }
 
+  /**
+   * @return $this
+   */
   public function all()
   {
-    $this->path[] = None::create();
-    return $this;
+    return $this->node(None::create());
   }
 
+  /**
+   * @param $search
+   * @param $replace
+   *
+   * @return array
+   */
   public function replace($search, $replace)
   {
-    $this->replaceAssoc([$search, $replace]);
+    return $this->replaceAssoc([$search, $replace]);
   }
 
+  /**
+   * @param array $association
+   *
+   * @return array
+   */
   public function replaceAssoc(array $association)
   {
-    $data = $this->data;
-    $iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($data));
+    $iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($this->data));
     $it       =
       new \CallbackFilterIterator($iterator, function (
         $current,
         $key,
         RecursiveIteratorIterator $iterator
-      ) use (&$data, $association) {
-        if ($iterator->getDepth() === 3 && isset($association[$current])) {
-          $key0 = $iterator->getSubIterator(0)->key();
-          $key1 = $iterator->getSubIterator(1)->key();
-          $key2 = $iterator->getSubIterator(2)->key();
-          $key3 = $iterator->getSubIterator(3)->key();
-          if ('dependency' === $key0 && 'c_ids' === $key2) {
-            $data[$key0][$key1][$key2][$key3] = $association[$current];
+      ) use ($association) {
+        if ($iterator->getDepth() + 1 === $this->countNodes() && isset($association[$current]))
+        {
+          $currentPath = ArrayPathHelper::getPath($iterator);
+          $filter      = array_filter($this->path, function($value){
+              return !$value instanceof None;
+            });
+          $diff        = array_diff_assoc($currentPath, $filter);
+          $keys        = array_intersect_key($filter, $diff);
+
+          if(!$keys)
+          {
+            ArrayPathHelper::pathSet($this->data, $currentPath, $association[$current]);
           }
         }
       });
 
     iterator_to_array($it);
-    $this->data = $data;
+    return $this->data;
   }
 
-  public function arraySet(&$arr, array $path, $value)
+
+  /**
+   * @return int
+   */
+  protected function countNodes()
   {
-    $cur =& $arr;
-    foreach ($path as $segment)
+    if(null === $this->count)
     {
-      if (!isset($cur[$segment]))
-      {
-        $cur[$segment] = [];
-      }
-
-      $cur =& $cur[$segment];
+      $this->count = count($this->path);
     }
-    $cur = $value;
-    unset($cur);
+    return $this->count;
   }
-
 }
