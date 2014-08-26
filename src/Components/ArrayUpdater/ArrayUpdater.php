@@ -180,7 +180,7 @@ class ArrayUpdater
    */
   protected function clearTmpVars()
   {
-    $this->count = null;
-    $this->pathFiltered = null;
+    $this->count = [];
+    $this->pathFiltered = [];
   }
 }
