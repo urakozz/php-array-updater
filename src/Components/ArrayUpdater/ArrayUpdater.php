@@ -16,77 +16,13 @@ use RecursiveIteratorIterator;
  *
  * @package Kozz\Components\ArrayUpdater
  */
-class ArrayUpdater
+class ArrayUpdater extends AbstractUpdater
 {
 
   /**
    * @var array
    */
-  protected $data = [];
-
-  /**
-   * @var array
-   */
-  protected $path = [];
-
-  /**
-   * @var array
-   */
   protected $pathFiltered = [];
-
-  /**
-   * @var
-   */
-  protected $count;
-
-  /**
-   * @param array $data
-   */
-  public function __construct(array $data)
-  {
-    $this->data = $data;
-  }
-
-  /**
-   * @param array $data
-   *
-   * @return ArrayUpdater
-   */
-  public static function from(array $data)
-  {
-    return new self($data);
-  }
-
-  /**
-   * @param $name
-   *
-   * @return $this
-   */
-  public function node($name)
-  {
-    $this->path[] = $name;
-    $this->clearTmpVars();
-    return $this;
-  }
-
-  /**
-   * @return $this
-   */
-  public function all()
-  {
-    return $this->node(None::create());
-  }
-
-  /**
-   * @param $search
-   * @param $replace
-   *
-   * @return array
-   */
-  public function replace($search, $replace)
-  {
-    return $this->replaceAssoc([$search, $replace]);
-  }
 
   /**
    * @param array $association
@@ -180,7 +116,7 @@ class ArrayUpdater
    */
   protected function clearTmpVars()
   {
-    $this->count = [];
     $this->pathFiltered = [];
+    parent::clearTmpVars();
   }
 }
