@@ -9,30 +9,14 @@ Recursive Array Updater
 
 
 ```php
-  $source = array(
-    'this' => array(
-      'is' => array(
-        'the' => array(
-          'path' => [
-            1,2,3,4,5
-          ]
-        )
-      )
-    )
-  );
+  $source = ['this' => ['is' => ['the' => ['path' => [
+    1,2,3,4,5
+  ]]]]];
   
   $array = ArrayUpdater::from($array)->node('this')->node('is')->node('the')->node('path')->all()->replace(1, 100);
   
-  $expected = array(
-    'this' => array(
-      'is' => array(
-        'the' => array(
-          'path' => [
+  $expected = ['this' => ['is' => ['the' => ['path' => [
             100,2,3,4,5
-          ]
-        )
-      )
-    )
-  );
+  ]]]]];
 
 ```
