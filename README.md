@@ -5,8 +5,9 @@ PHP Array Updater
 [![Coverage Status](https://img.shields.io/coveralls/urakozz/php-array-updater.svg)](https://coveralls.io/r/urakozz/php-array-updater?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/urakozz/php-array-updater/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/urakozz/php-array-updater/?branch=master)
 
-Recursive Array Updater
+## Recursive Array Updater
 
+#### Update One
 
 ```php
   $source = ['this' => ['is' => ['the' => ['path' => [
@@ -24,4 +25,35 @@ Recursive Array Updater
    * ]]]]];
    */
   
+```
+
+#### Update Multiple
+
+```php
+  $source = ['this' => [
+    ['the' => ['path' => [
+      1,2,3,4,5
+    ]]],
+    ['the' => ['path' => [
+      1,2,3,4,5
+    ]]]
+  ]];
+  
+  $array = 
+    ArrayUpdater::from($array)
+    ->node('this')->all()->node('the')->node('path')->all()
+    ->replaceAssoc([1=>100, 3=>300]);
+  
+  /**
+   *
+   * $array = ['this' => [
+   *  ['the' => ['path' => [
+   *    100,2,300,4,5
+   *  ]]],
+   *  ['the' => ['path' => [
+   *    100,2,300,4,5
+   *  ]]]
+   * ]];
+   */
+   *
 ```
