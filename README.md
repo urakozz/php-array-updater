@@ -6,3 +6,33 @@ PHP Array Updater
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/urakozz/php-array-updater/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/urakozz/php-array-updater/?branch=master)
 
 Recursive Array Updater
+
+
+```php
+  $source = array(
+    'this' => array(
+      'is' => array(
+        'the' => array(
+          'path' => [
+            1,2,3,4,5
+          ]
+        )
+      )
+    )
+  );
+  
+  $array = ArrayUpdater::from($array)->node('this')->node('is')->node('the')->node('path')->all()->replace(1, 100);
+  
+  $expected = array(
+    'this' => array(
+      'is' => array(
+        'the' => array(
+          'path' => [
+            100,2,3,4,5
+          ]
+        )
+      )
+    )
+  );
+
+```
