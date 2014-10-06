@@ -13,7 +13,10 @@ Recursive Array Updater
     1,2,3,4,5
   ]]]]];
   
-  $array = ArrayUpdater::from($array)->node('this')->node('is')->node('the')->node('path')->all()->replace(1, 100);
+  $array = 
+    ArrayUpdater::from($array)
+    ->node('this')->node('is')->node('the')->node('path')->all()
+    ->replace(1, 100);
   
   $expected = ['this' => ['is' => ['the' => ['path' => [
     100,2,3,4,5
