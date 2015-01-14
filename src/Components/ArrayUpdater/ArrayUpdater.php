@@ -8,6 +8,7 @@ namespace Kozz\Components\ArrayUpdater;
 use CallbackFilterIterator;
 use Kozz\Helper\ArrayHelper\ArrayPathHelper;
 use PhpOption\None;
+use PhpOption\Option;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 
@@ -56,13 +57,11 @@ class ArrayUpdater extends AbstractUpdater
    */
   protected function getFilteredPath()
   {
-    if(!$this->pathFiltered)
-    {
-      $this->pathFiltered = array_filter($this->path, function($value){
+    return Option::fromValue($this->pathFiltered)->getOrCall(function(){
+      return $this->pathFiltered = array_filter($this->path, function($value){
         return !$value instanceof None;
       });
-    }
-    return $this->pathFiltered;
+    });
   }
 
   /**
